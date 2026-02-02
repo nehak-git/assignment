@@ -1,18 +1,11 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard, ProductCardSkeleton, ErrorMessage } from "@/components/common";
-import { useProductsStore } from "@/stores";
+import { useProducts } from "@/hooks";
 
 export function HomePage() {
-  const { products, isLoading, error, fetchProducts } = useProductsStore();
-
-  useEffect(() => {
-    if (products.length === 0) {
-      fetchProducts();
-    }
-  }, [products.length, fetchProducts]);
+  const { products, isLoading, error, refetch } = useProducts();
 
   const featuredProducts = [...products]
     .sort((a, b) => b.rating.rate - a.rating.rate)
@@ -23,7 +16,7 @@ export function HomePage() {
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-xl space-y-6">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl leading-tight">
               Curated products for modern living
             </h1>
             <p className="text-muted-foreground text-lg">
@@ -42,7 +35,7 @@ export function HomePage() {
       <section className="py-16 md:py-24 border-t">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="font-display text-2xl md:text-3xl">Featured</h2>
+            <h2 className="text-2xl md:text-3xl">Featured</h2>
             <Link 
               to="/products" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -54,7 +47,7 @@ export function HomePage() {
           {error && (
             <ErrorMessage
               message={error}
-              onRetry={fetchProducts}
+              onRetry={refetch}
               variant="card"
               className="my-8"
             />
@@ -68,23 +61,6 @@ export function HomePage() {
                 <ProductCard key={product.id} product={product} />
               ))
             )}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24 border-t bg-muted/50">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            {[
-              { title: "Free Shipping", desc: "On orders over $50" },
-              { title: "Easy Returns", desc: "30 day return policy" },
-              { title: "Secure Checkout", desc: "100% protected payments" },
-            ].map((item) => (
-              <div key={item.title} className="space-y-2">
-                <h3 className="font-medium">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

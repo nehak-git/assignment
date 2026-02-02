@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Heart, Star, Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "@/components/common";
-import { useProductsStore, useFavoritesStore, useCartStore } from "@/stores";
+import { useFavoritesStore, useCartStore } from "@/stores";
+import { useProduct } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -13,27 +13,23 @@ export function ProductDetailPage() {
   const navigate = useNavigate();
   const productId = id ? parseInt(id, 10) : null;
   
-  const { currentProduct, isLoadingProduct, productError, fetchProductById } = useProductsStore();
+  const { product, isLoading, error, refetch } = useProduct(productId);
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const { addToCart, isInCart } = useCartStore();
 
-  useEffect(() => {
-    if (productId !== null) fetchProductById(productId);
-  }, [productId, fetchProductById]);
-
-  const favorite = currentProduct ? isFavorite(currentProduct.id) : false;
-  const inCart = currentProduct ? isInCart(currentProduct.id) : false;
+  const favorite = product ? isFavorite(product.id) : false;
+  const inCart = product ? isInCart(product.id) : false;
 
   const handleFavoriteClick = () => {
-    if (currentProduct) {
-      toggleFavorite(currentProduct.id);
+    if (product) {
+      toggleFavorite(product.id);
       toast.success(favorite ? "Removed from favorites" : "Added to favorites");
     }
   };
 
   const handleAddToCart = () => {
-    if (currentProduct) {
-      addToCart(currentProduct);
+    if (product) {
+      addToCart(product);
       toast.success("Added to cart");
     }
   };
@@ -43,7 +39,7 @@ export function ProductDetailPage() {
     toast.success("Link copied");
   };
 
-  if (isLoadingProduct) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 md:px-6 py-8">
         <Skeleton className="h-8 w-32 mb-8" />
@@ -60,7 +56,7 @@ export function ProductDetailPage() {
     );
   }
 
-  if (productError || !currentProduct) {
+  if (error || !product) {
     return (
       <div className="container mx-auto px-4 md:px-6 py-8">
         <Button variant="ghost" onClick={() => navigate("/products")} className="mb-8">
@@ -69,8 +65,8 @@ export function ProductDetailPage() {
         </Button>
         <ErrorMessage
           title="Product not found"
-          message={productError || "This product doesn't exist."}
-          onRetry={() => productId && fetchProductById(productId)}
+          message={error || "This product doesn't exist."}
+          onRetry={refetch}
           variant="card"
         />
       </div>
@@ -87,8 +83,8 @@ export function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8 md:gap-12">
         <div className="aspect-square bg-muted rounded-lg p-8 flex items-center justify-center">
           <img
-            src={currentProduct.image}
-            alt={currentProduct.title}
+            src={product.image}
+            alt={product.title}
             className="max-h-full max-w-full object-contain"
           />
         </div>
@@ -96,25 +92,25 @@ export function ProductDetailPage() {
         <div className="space-y-6">
           <div>
             <p className="text-sm text-muted-foreground capitalize mb-2">
-              {currentProduct.category}
+              {product.category}
             </p>
-            <h1 className="font-display text-2xl md:text-3xl mb-3">
-              {currentProduct.title}
+            <h1 className="text-2xl md:text-3xl mb-3">
+              {product.title}
             </h1>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-              <span>{currentProduct.rating.rate}</span>
+              <span>{product.rating.rate}</span>
               <span>·</span>
-              <span>{currentProduct.rating.count} reviews</span>
+              <span>{product.rating.count} reviews</span>
             </div>
           </div>
 
           <p className="text-2xl font-medium">
-            ${currentProduct.price.toFixed(2)}
+            ${product.price.toFixed(2)}
           </p>
 
           <p className="text-muted-foreground leading-relaxed">
-            {currentProduct.description}
+            {product.description}
           </p>
 
           <div className="flex gap-3 pt-4">
@@ -148,15 +144,11 @@ export function ProductDetailPage() {
             </Button>
           </div>
 
-          <div className="pt-6 border-t text-sm text-muted-foreground">
-            <p>Free shipping on orders over $50</p>
-          </div>
-
           <Link
-            to={`/products?category=${encodeURIComponent(currentProduct.category)}`}
-            className="inline-block text-sm text-primary hover:underline"
+            to={`/products?category=${encodeURIComponent(product.category)}`}
+            className="inline-block text-sm text-primary hover:underline pt-4"
           >
-            More in {currentProduct.category} →
+            More in {product.category} →
           </Link>
         </div>
       </div>

@@ -41,8 +41,6 @@ export function CartPage() {
   }
 
   const subtotal = totalPrice();
-  const shipping = subtotal >= 50 ? 0 : 5.99;
-  const total = subtotal + shipping;
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -109,22 +107,13 @@ export function CartPage() {
                 <span className="text-muted-foreground">Subtotal ({totalItems()} items)</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
-              </div>
-              {shipping > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Add ${(50 - subtotal).toFixed(2)} more for free shipping
-                </p>
-              )}
             </div>
 
             <Separator className="my-4" />
 
             <div className="flex justify-between font-medium mb-6">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
 
             <Button className="w-full" size="lg">

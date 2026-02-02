@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,8 @@ import {
   ErrorMessage,
   EmptyState,
 } from "@/components/common";
-import { useProductsStore, useFiltersStore } from "@/stores";
+import { useFiltersStore } from "@/stores";
+import { useProducts, useCategories } from "@/hooks";
 import type { SortOption } from "@/types";
 
 const sortOptions: { value: SortOption; label: string }[] = [
@@ -27,13 +27,9 @@ const sortOptions: { value: SortOption; label: string }[] = [
 ];
 
 export function ProductsPage() {
-  const { products, categories, isLoading, isLoadingCategories, error, fetchProducts, fetchCategories } = useProductsStore();
+  const { products, isLoading, error, refetch } = useProducts();
+  const { categories, isLoading: isLoadingCategories } = useCategories();
   const { filters, setSearchQuery, setCategory, setSortBy, resetFilters, filterAndSortProducts } = useFiltersStore();
-
-  useEffect(() => {
-    if (products.length === 0) fetchProducts();
-    if (categories.length === 0) fetchCategories();
-  }, [products.length, categories.length, fetchProducts, fetchCategories]);
 
   const filteredProducts = filterAndSortProducts(products);
   const hasActiveFilters = filters.searchQuery !== "" || filters.category !== "all" || filters.sortBy !== "default";
@@ -41,7 +37,7 @@ export function ProductsPage() {
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="font-display text-3xl md:text-4xl mb-2">Shop</h1>
+        <h1 className="text-3xl md:text-4xl mb-2">Shop</h1>
         <p className="text-muted-foreground">
           {filteredProducts.length} products
         </p>
@@ -90,7 +86,7 @@ export function ProductsPage() {
       </div>
 
       {error && (
-        <ErrorMessage message={error} onRetry={fetchProducts} variant="card" className="my-8" />
+        <ErrorMessage message={error} onRetry={refetch} variant="card" className="my-8" />
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">

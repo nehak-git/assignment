@@ -1,18 +1,14 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard, ProductCardSkeleton, EmptyState } from "@/components/common";
-import { useProductsStore, useFavoritesStore } from "@/stores";
+import { useFavoritesStore } from "@/stores";
+import { useProducts } from "@/hooks";
 
 export function FavoritesPage() {
   const navigate = useNavigate();
-  const { products, isLoading, fetchProducts } = useProductsStore();
+  const { products, isLoading } = useProducts();
   const { favorites, clearFavorites } = useFavoritesStore();
-
-  useEffect(() => {
-    if (products.length === 0) fetchProducts();
-  }, [products.length, fetchProducts]);
 
   const favoriteProducts = products.filter((p) => favorites.includes(p.id));
 
@@ -20,7 +16,7 @@ export function FavoritesPage() {
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display text-3xl mb-1">Favorites</h1>
+          <h1 className="text-3xl mb-1">Favorites</h1>
           <p className="text-muted-foreground text-sm">
             {favorites.length} {favorites.length === 1 ? "item" : "items"} saved
           </p>
