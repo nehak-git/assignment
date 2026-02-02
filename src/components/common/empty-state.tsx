@@ -14,26 +14,19 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = "No items found",
-  description = "There are no items to display at the moment.",
+  title = "Nothing here",
+  description = "No items to display",
   icon,
   action,
   className,
 }: EmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center gap-4 p-12 text-center",
-        className
-      )}
-    >
-      <div className="rounded-full bg-muted p-4">
+    <div className={cn("flex flex-col items-center justify-center py-16 text-center", className)}>
+      <div className="mb-4">
         {icon || <Package className="h-8 w-8 text-muted-foreground" />}
       </div>
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <p className="text-sm text-muted-foreground max-w-md">{description}</p>
-      </div>
+      <h3 className="font-medium mb-1">{title}</h3>
+      <p className="text-sm text-muted-foreground mb-6 max-w-sm">{description}</p>
       {action && (
         <Button variant="outline" onClick={action.onClick}>
           {action.label}

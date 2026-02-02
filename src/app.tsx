@@ -6,6 +6,7 @@ import {
   ProductsPage,
   ProductDetailPage,
   FavoritesPage,
+  CartPage,
   NotFoundPage,
 } from "@/pages";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id" element={<ProductDetailPage />} />
           <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="cart" element={<CartPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
 import { Heart, Star } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useFavoritesStore } from "@/stores";
+import { useFavoritesStore, useCartStore } from "@/stores";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -14,73 +13,73 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const { toggleFavorite, isFavorite } = useFavoritesStore();
+  const { addToCart, isInCart } = useCartStore();
   const favorite = isFavorite(product.id);
+  const inCart = isInCart(product.id);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toggleFavorite(product.id);
+    toast.success(favorite ? "Removed from favorites" : "Added to favorites");
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+    toast.success("Added to cart");
   };
 
   return (
-    <Link to={`/products/${product.id}`}>
-      <Card
-        className={cn(
-          "group h-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
-          className
-        )}
-      >
-        <div className="relative aspect-square bg-white overflow-hidden">
+    <Link to={`/products/${product.id}`} className={cn("group block", className)}>
+      <div className="space-y-3">
+        <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
           <img
             src={product.image}
             alt={product.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
-
+          
           <Button
-            variant="secondary"
+            variant="ghost"
             size="icon"
             className={cn(
-              "absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200",
-              favorite && "opacity-100 bg-red-100 text-red-600 hover:bg-red-200"
+              "absolute top-2 right-2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity",
+              favorite && "opacity-100 text-red-500"
             )}
             onClick={handleFavoriteClick}
-            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart className={cn("h-4 w-4", favorite && "fill-current")} />
           </Button>
-
-          <Badge
-            variant="secondary"
-            className="absolute bottom-2 left-2 capitalize text-xs"
-          >
-            {product.category}
-          </Badge>
         </div>
 
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-medium text-sm line-clamp-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium line-clamp-1">
             {product.title}
           </h3>
-
-          <div className="flex items-center gap-1.5">
-            <div className="flex items-center gap-1 text-amber-500">
-              <Star className="h-4 w-4 fill-current" />
-              <span className="text-sm font-medium">{product.rating.rate}</span>
-            </div>
-            <span className="text-xs text-muted-foreground">
-              ({product.rating.count} reviews)
-            </span>
-          </div>
-
+          
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-primary">
+            <span className="text-sm font-medium">
               ${product.price.toFixed(2)}
             </span>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Star className="h-3 w-3 fill-current text-amber-500" />
+              <span className="text-xs">{product.rating.rate}</span>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <Button
+            variant={inCart ? "secondary" : "outline"}
+            size="sm"
+            className="w-full mt-2 h-8 text-xs"
+            onClick={handleAddToCart}
+          >
+            {inCart ? "In Cart" : "Add to Cart"}
+          </Button>
+        </div>
+      </div>
     </Link>
   );
 }

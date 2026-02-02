@@ -5,4 +5,3 @@ export { Navbar } from "./navbar";
 export { Footer } from "./footer";
 export { ProductCard } from "./product-card";
 export { ProductCardSkeleton } from "./product-card-skeleton";
-export { SearchAndFilter } from "./search-and-filter";
