@@ -27,7 +27,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="font-display text-xl">
-            Maison
+            ShopWise
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
